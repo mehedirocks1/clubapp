@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Str;  // To generate a random password
 use Illuminate\Support\Facades\Mail;  // For sending the random password via email
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Mime\Part\TextPart;
+
 class RegistrationController extends Controller
 {
     // Show the registration form
@@ -18,7 +18,6 @@ class RegistrationController extends Controller
         return view('frontend.registration'); // Return the registration view
     }
 
-    // Handle the registration form submission
     public function register(Request $request)
     {
         // Validate the incoming request
@@ -35,47 +34,90 @@ class RegistrationController extends Controller
             'blood_group' => 'required|in:A+,B+,O+,AB+,A-,B-,O-,AB-',
             'education' => 'required|in:high_school,bachelor,master,phd',
             'profession' => 'required|string|max:255',
+            'skills' => 'required|string|max:255',
             'password' => 'nullable|string|min:8|confirmed', // Password is nullable, as we will generate a random one
             'terms' => 'accepted',
+            'country' => 'required|string|max:255',
+            'division' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'thana' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'membership_type' => 'required|in:basic,premium,VIP',
         ]);
+        
+        // Determine registration fee based on membership type
+        $registrationFee = 0;
+        switch ($request->membership_type) {
+            case 'basic':
+                $registrationFee = 100;
+                break;
+            case 'premium':
+                $registrationFee = 200;
+                break;
+            case 'VIP':
+                $registrationFee = 400;
+                break;
+        }
 
         // Check if the photo is uploaded successfully
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             // Use storeAs to save the file with its original name
             $photoPath = $request->file('photo')->storeAs('public/photos', $request->file('photo')->getClientOriginalName());
         } else {
-            // If no photo is uploaded or invalid
             return back()->withErrors(['photo' => 'No valid photo uploaded.']);
         }
 
         // Generate a random password if not provided
         $randomPassword = Str::random(12);  // Generate a random 12-character password
 
-        // Create the user with all validated data
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'bangla_name' => $request->bangla_name,
-            'photo' => $photoPath,  // Store the file path
-            'email' => $request->email,
-            'mobile_number' => $request->mobile_number,
-            'dob' => $request->dob,
-            'nid' => $request->nid,
-            'gender' => $request->gender,
-            'blood_group' => $request->blood_group,
-            'education' => $request->education,
-            'profession' => $request->profession,
-            'password' => Hash::make($randomPassword), // Hash the random password
-            'role_id' => 3,  // Default role_id set to 3 (User role)
-        ]);
-
-        // Send the password to the user via email
-        $this->sendPasswordEmail($user, $randomPassword);
-
-        // Redirect to the success page
-        return redirect()->route('register.success');
+        try {
+            // Create the user with all validated data, including registration fee
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'bangla_name' => $request->bangla_name,
+                'photo' => $photoPath,  // Store the file path
+                'email' => $request->email,
+                'mobile_number' => $request->mobile_number,
+                'dob' => $request->dob,
+                'nid' => $request->nid,
+                'gender' => $request->gender,
+                'blood_group' => $request->blood_group,
+                'education' => $request->education,
+                'profession' => $request->profession,
+                'skills' => $request->skills,
+                'country' => $request->country,  // New field
+                'division' => $request->division,  // New field
+                'district' => $request->district,  // New field
+                'thana' => $request->thana,  // New field
+                'address' => $request->address,  // New field
+                'membership_type' => $request->membership_type,  // New field
+                'registration_fee' => $registrationFee,  // Save the registration fee
+                'password' => Hash::make($randomPassword), // Hash the random password
+                'role_id' => 3,  // Default role_id set to 3 (User role)
+                'terms' => 'accepted',
+            ]);
+        
+            // Manually set the email_verified_at field
+            $user->email_verified_at = now();
+        
+            // Generate and set the remember_token after user creation
+            $user->update(['remember_token' => Str::random(60)]);
+        
+            // Save the user with the updated remember_token
+            $user->save();
+        
+            // Send the password to the user via email
+            $this->sendPasswordEmail($user, $randomPassword);
+        
+            // Redirect to the success page
+            return redirect()->route('register.success');
+        } catch (\Exception $e) {
+            // Handle errors
+            Log::error('User registration failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Registration failed, please try again.']);
+        }
     }
-
 
     private function sendPasswordEmail($user, $password)
     {
@@ -94,8 +136,6 @@ class RegistrationController extends Controller
             Log::error('Error sending email: ' . $e->getMessage());
         }
     }
-    
-    
 
     // Show the registration success page
     public function success()

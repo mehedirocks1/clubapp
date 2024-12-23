@@ -33,10 +33,11 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('membership_type')->nullable();
             $table->string('registration_fee')->nullable();
-            $table->boolean('terms_accepted')->default(false);
+            $table->boolean('terms_accepted')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->unsignedTinyInteger('role_id')->default(3); // Default role: 3 (User)
+            $table->tinyInteger('status')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });

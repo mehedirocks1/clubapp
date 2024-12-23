@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             'terms_accepted' => true,
             'password' => bcrypt('admin123'), // Secure password
             'role_id' => 1, // Admin Role
+            'status' => 1, // Active
         ]);
 
         // Seed Staff User
@@ -64,6 +65,7 @@ class DatabaseSeeder extends Seeder
             'terms_accepted' => true,
             'password' => bcrypt('staff123'),
             'role_id' => 2, // Staff Role
+            'status' => 1, // Active
         ]);
 
         // Seed Regular User
@@ -91,6 +93,7 @@ class DatabaseSeeder extends Seeder
             'terms_accepted' => true,
             'password' => bcrypt('user123'),
             'role_id' => 3, // User Role
+            'status' => 1, // Active
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,6 +40,10 @@ class User extends Authenticatable
         'registration_fee',
         'terms_accepted',
         'role_id', // Use role_id instead of role field
+        'status', // Assuming 'status' indicates whether the user is active
+        'remember_token',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -56,11 +61,53 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed', // Automatically hashes the password when setting
+    ];
+
+    /**
+     * Get the full name (first_name + last_name).
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    /**
+     * Get the role of the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    /**
+     * Scope a query to only include active users.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1); // Assuming 'status' indicates whether the user is active
+    }
+
+    /**
+     * Scope a query to only include users with a specific membership type.
+     */
+    public function scopeMembershipType($query, $membershipType)
+    {
+        return $query->where('membership_type', $membershipType);
+    }
+
+    /**
+     * Send a password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
 }

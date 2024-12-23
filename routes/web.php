@@ -1,11 +1,48 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BackendController;
+use App\Http\Controllers\MemberController;
+
+
+
+
+
+
+/*
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::get('members', [MemberController::class, 'index'])->name('members.index');
+    Route::get('members/edit/{id}', [MemberController::class, 'edit'])->name('members.edit');
+    Route::put('members/update/{id}', [MemberController::class, 'update'])->name('members.update');
+    Route::delete('members/{id}', [MemberController::class, 'destroy'])->name('members.destroy'); 
+    Route::put('members/status/{id}', [MemberController::class, 'updateStatus'])->name('members.updateStatus');
+    Route::get('members/show/{id}', [MemberController::class, 'show'])->name('members.show');
+
+});
+*/
+
+
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::get('members', [MemberController::class, 'index'])->name('members.index');
+    Route::get('members/edit/{id}', [MemberController::class, 'edit'])->name('members.edit');
+    Route::put('members/update/{id}', [MemberController::class, 'update'])->name('members.update');
+    Route::delete('members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
+    Route::put('members/status/{id}', [MemberController::class, 'updateStatus'])->name('members.updateStatus');
+    Route::get('members/show/{id}', [MemberController::class, 'show'])->name('members.show');
+});
+
+
+
+
+
+
 
 
 
@@ -34,8 +71,28 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth'])
     ->name('backend.admin.dashboard'); // Correct route name for admin dashboard
 
+
+
+
 //Logout ROute
  Route::post('/logout', function () { Auth::logout(); return redirect('/login'); })->name('logout');
+
+
+
+
+ //Backend Admin Routes
+ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+     Route::get('/dashboard/view-members', [BackendController::class, 'viewMembers'])->name('viewMembers');
+     Route::get('/dashboard/view-member/{id}', [BackendController::class, 'viewMember'])->name('viewMember');
+     Route::get('/dashboard/download-member/{id}', [BackendController::class, 'downloadMember'])->name('downloadMember');
+     Route::get('/dashboard/reset-password/{id}', [BackendController::class, 'resetPassword'])->name('resetPassword');
+     Route::get('/dashboard/send-message/{id}', [BackendController::class, 'sendMessage'])->name('sendMessage');
+ });
+ 
+
+
+
+
 
 
 // Custom Registration Routes
