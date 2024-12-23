@@ -95,6 +95,32 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
 
 
 
+ 
+ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+
+    // Show Admin Profile
+    Route::get('/profile', [BackendController::class, 'viewProfile'])->name('viewProfile');
+    
+    // Edit Admin Profile
+    Route::get('/profile/edit', [BackendController::class, 'editProfile'])->name('editProfile');
+
+    // Update Admin Profile
+    Route::post('/profile/update', [BackendController::class, 'updateProfile'])->name('updateProfile');
+    
+    // Show Change Password Form
+    Route::get('/profile/change-password', [BackendController::class, 'changePasswordForm'])->name('changePasswordForm');
+
+    // Change Admin Password
+    Route::post('/profile/change-password', [BackendController::class, 'changePassword'])->name('changePassword');
+});
+
+
+
+
+
+
+
+
 // Custom Registration Routes
 Route::get('/register', [RegistrationController::class, 'showForm'])->name('register.form');
 //oute::post('/register', [RegistrationController::class, 'register'])->name('register.submit');

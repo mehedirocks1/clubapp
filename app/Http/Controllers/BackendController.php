@@ -70,4 +70,125 @@ class BackendController extends Controller
 
         return redirect()->back()->with('success', 'User status updated successfully.');
     }
+
+
+
+     // Show Admin Profile
+     public function viewProfile()
+     {
+         $admin = auth()->user();
+ 
+         // Manual role check (only allow if role_id is 1)
+         if ($admin->role_id != 1) {
+             abort(403, 'Unauthorized action.');
+         }
+ 
+         return view('backend.admin.profile.view', compact('admin'));
+     }
+ 
+     // Edit Admin Profile
+     public function editProfile()
+     {
+         $admin = auth()->user();
+ 
+         // Manual role check (only allow if role_id is 1)
+         if ($admin->role_id != 1) {
+             abort(403, 'Unauthorized action.');
+         }
+ 
+         return view('backend.admin.profile.edit', compact('admin'));
+     }
+ 
+     // Update Admin Profile
+     public function updateProfile(Request $request)
+     {
+         $admin = auth()->user();
+ 
+         // Manual role check (only allow if role_id is 1)
+         if ($admin->role_id != 1) {
+             abort(403, 'Unauthorized action.');
+         }
+ 
+         // Validate the inputs for all fields
+         $validatedData = $request->validate([
+             'first_name' => 'required|string|max:255',
+             'last_name' => 'required|string|max:255',
+             'bangla_name' => 'nullable|string|max:255',
+             'email' => 'required|email|unique:users,email,' . $admin->id,
+             'mobile_number' => 'nullable|string|max:15',
+             'date_of_birth' => 'nullable|date',
+             'nid' => 'nullable|string|max:17',
+             'gender' => 'nullable|in:male,female,other',
+             'blood_group' => 'nullable|string|max:5',
+             'education' => 'nullable|string|max:255',
+             'profession' => 'nullable|string|max:255',
+             'skills' => 'nullable|string|max:255',
+             'country' => 'nullable|string|max:255',
+             'division' => 'nullable|string|max:255',
+             'district' => 'nullable|string|max:255',
+             'thana' => 'nullable|string|max:255',
+             'address' => 'nullable|string|max:500',
+             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+         ]);
+ 
+         // Handle profile photo upload if exists
+         if ($request->hasFile('photo')) {
+             // Remove the old photo if any
+             if ($admin->photo && file_exists(public_path('uploads/' . $admin->photo))) {
+                 unlink(public_path('uploads/' . $admin->photo));
+             }
+ 
+             // Store the new photo
+             $photoPath = $request->file('photo')->store('uploads', 'public');
+             $validatedData['photo'] = $photoPath;
+         }
+ 
+         // Update profile data
+         $admin->update($validatedData);
+ 
+         return redirect()->route('admin.viewProfile')->with('success', 'Profile updated successfully.');
+     }
+ 
+     // Show Change Password Form
+     public function changePasswordForm()
+     {
+         $admin = auth()->user();
+ 
+         // Manual role check (only allow if role_id is 1)
+         if ($admin->role_id != 1) {
+             abort(403, 'Unauthorized action.');
+         }
+ 
+         return view('backend.admin.profile.change-password');
+     }
+ 
+     // Change Admin Password
+     public function changePassword(Request $request)
+     {
+         $admin = auth()->user();
+ 
+         // Manual role check (only allow if role_id is 1)
+         if ($admin->role_id != 1) {
+             abort(403, 'Unauthorized action.');
+         }
+ 
+         // Validate the inputs
+         $validatedData = $request->validate([
+             'current_password' => 'required',
+             'password' => 'required|min:8|confirmed',
+         ]);
+ 
+         // Check if the current password is correct
+         if (!Hash::check($request->current_password, $admin->password)) {
+             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+         }
+ 
+         // Update the password
+         $admin->update(['password' => Hash::make($request->password)]);
+ 
+         return redirect()->route('admin.changePasswordForm')->with('success', 'Password changed successfully.');
+     }
+
+
+
 }

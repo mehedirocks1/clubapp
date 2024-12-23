@@ -117,13 +117,16 @@
                     </li>
 
                     <!-- Manage Profile -->
-                    <li class="nav-item">
-                        <a href="#manageProfileMenu" data-bs-toggle="collapse">Manage Profile</a>
-                        <div class="collapse submenu" id="manageProfileMenu">
-                            <a href="#" class="nav-link">Your Profile</a>
-                            <a href="#" class="nav-link">Change Password</a>
-                        </div>
-                    </li>
+                   <!-- Manage Profile -->
+<li class="nav-item">
+    <a href="#manageProfileMenu" data-bs-toggle="collapse">Manage Profile</a>
+    <div class="collapse submenu" id="manageProfileMenu">
+        <a href="{{ route('admin.viewProfile') }}" class="nav-link">Your Profile</a>
+        <a href="{{ route('admin.editProfile') }}" class="nav-link">Edit Profile</a>
+        <a href="{{ route('admin.changePassword') }}" class="nav-link">Change Password</a>
+    </div>
+</li>
+
 
                     <!-- Site Settings -->
                     <li class="nav-item">
