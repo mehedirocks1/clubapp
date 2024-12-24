@@ -58,14 +58,15 @@ class RegistrationController extends Controller
                 $registrationFee = 400;
                 break;
         }
-
-        // Check if the photo is uploaded successfully
+//Photo Uploading
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            // Use storeAs to save the file with its original name
-            $photoPath = $request->file('photo')->storeAs('public/photos', $request->file('photo')->getClientOriginalName());
+            $timestamp = time(); // Generate a timestamp
+            $photoName = $request->first_name . '_' . $timestamp . '.' . $request->file('photo')->getClientOriginalExtension(); // Combine first name and timestamp
+            $photoPath = $request->file('photo')->move(public_path('profilepics'), $photoName); // Save the file in the profilepics folder
         } else {
             return back()->withErrors(['photo' => 'No valid photo uploaded.']);
         }
+        
 
         // Generate a random password if not provided
         $randomPassword = Str::random(12);  // Generate a random 12-character password

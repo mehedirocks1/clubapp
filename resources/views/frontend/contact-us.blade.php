@@ -38,7 +38,6 @@
       <ul class="list-unstyled">
         <li><strong>Address:</strong> 123 Main Street, New York, NY 10001</li>
         <li><strong>Phone:</strong> +1 234 567 890</li>
-        <li><strong>Email:</strong> contact@company.com</li>
         <li><strong>Working Hours:</strong> Mon-Fri, 9 AM - 6 PM</li>
       </ul>
     </div>

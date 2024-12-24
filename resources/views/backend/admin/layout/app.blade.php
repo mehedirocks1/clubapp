@@ -132,10 +132,12 @@
                     <li class="nav-item">
                         <a href="#siteSettingsMenu" data-bs-toggle="collapse">Site Settings</a>
                         <div class="collapse submenu" id="siteSettingsMenu">
-                            <a href="#" class="nav-link">Change Logo</a>
-                            <a href="#" class="nav-link">View Contact</a>
-                            <a href="#" class="nav-link">View Slider</a>
-                            <a href="#" class="nav-link">View About</a>
+                        <a href="{{ route('admin.changeLogo') }}" class="nav-link">Change Logo</a>
+    <a href="{{ route('admin.viewContact') }}" class="nav-link">View Contact</a>
+    <a href="{{ route('admin.viewSlider') }}" class="nav-link">View Slider</a>
+    <a href="{{ route('admin.branches') }}" class="nav-link">Branches</a>
+    <a href="{{ route('admin.viewAbout') }}" class="nav-link">View About</a>
+    <a href="{{ route('admin.gallery') }}" class="nav-link">Gallery</a>
                         </div>
                     </li>
 
@@ -171,4 +173,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
 </html>

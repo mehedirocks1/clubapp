@@ -6,8 +6,7 @@
 
         <form action="{{ route('admin.updateProfile') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            @method('POST')
-
+            @method('PUT')
             <div class="row">
                 <!-- Left Column -->
                 <div class="col-md-6">
@@ -26,7 +25,7 @@
                     <!-- Bangla Name -->
                     <div class="mb-3">
                         <label for="bangla_name" class="form-label">Bangla Name</label>
-                        <input type="text" class="form-control" name="bangla_name" value="{{ old('bangla_name', $admin->bangla_name) }}" required>
+                        <input type="text" class="form-control" name="bangla_name" value="{{ old('bangla_name', $admin->bangla_name) }}">
                     </div>
 
                     <!-- Email -->
@@ -75,19 +74,19 @@
                     <!-- Blood Group -->
                     <div class="mb-3">
                         <label for="blood_group" class="form-label">Blood Group</label>
-                        <input type="text" class="form-control" name="blood_group" value="{{ old('blood_group', $admin->blood_group) }}" required>
+                        <input type="text" class="form-control" name="blood_group" value="{{ old('blood_group', $admin->blood_group) }}">
                     </div>
 
                     <!-- Education -->
                     <div class="mb-3">
                         <label for="education" class="form-label">Education</label>
-                        <input type="text" class="form-control" name="education" value="{{ old('education', $admin->education) }}" required>
+                        <input type="text" class="form-control" name="education" value="{{ old('education', $admin->education) }}">
                     </div>
 
                     <!-- Profession -->
                     <div class="mb-3">
                         <label for="profession" class="form-label">Profession</label>
-                        <input type="text" class="form-control" name="profession" value="{{ old('profession', $admin->profession) }}" required>
+                        <input type="text" class="form-control" name="profession" value="{{ old('profession', $admin->profession) }}">
                     </div>
 
                     <!-- Skills -->

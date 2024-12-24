@@ -8,6 +8,10 @@ php artisan make:controller DashboardController
 
 
 
+php artisan make:model AboutUs -mfs
+php artisan make:model Branch -mfs
+php artisan make:model Contact -mfs
+php artisan make:model Gallery -mfs
 
 
 

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\AboutUsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,6 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $this->call(AboutUsSeeder::class);
+        $this->call(BranchSeeder::class);
+        $this->call(ContactSeeder::class);
+        $this->call(GallerySeeder::class);
+
+
+
+
+
         // Seed Admin User
         User::factory()->create([
             'first_name' => 'Admin',

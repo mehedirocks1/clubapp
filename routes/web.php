@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\RegistrationController;
@@ -10,7 +11,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BackendController;
 use App\Http\Controllers\MemberController;
-
+use App\Http\Controllers\WebsiteController;
 
 
 
@@ -61,15 +62,15 @@ Route::get('/gallery', [FrontendController::class, 'gallery'])->name('frontend.g
 
 Route::get('/user/dashboard', [DashboardController::class, 'user'])
     ->middleware(['auth'])
-    ->name('backend.user.dashboard'); // Correct route name for user dashboard
+    ->name('backend.user.dashboard'); 
 
 Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth'])
-    ->name('backend.staff.dashboard'); // Correct route name for staff dashboard
+    ->name('backend.staff.dashboard');
 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth'])
-    ->name('backend.admin.dashboard'); // Correct route name for admin dashboard
+    ->name('backend.admin.dashboard'); 
 
 
 
@@ -94,36 +95,39 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
 
 
 
-
- 
  Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-
-    // Show Admin Profile
+    // Profile-related routes
     Route::get('/profile', [BackendController::class, 'viewProfile'])->name('viewProfile');
-    
-    // Edit Admin Profile
     Route::get('/profile/edit', [BackendController::class, 'editProfile'])->name('editProfile');
-
-    // Update Admin Profile
-    Route::post('/profile/update', [BackendController::class, 'updateProfile'])->name('updateProfile');
-    
-    // Show Change Password Form
+    Route::put('/profile/update', [BackendController::class, 'updateProfile'])->name('updateProfile');
     Route::get('/profile/change-password', [BackendController::class, 'changePasswordForm'])->name('changePasswordForm');
+    Route::put('/profile/change-password', [BackendController::class, 'changePassword'])->name('changePassword');
 
-    // Change Admin Password
-    Route::post('/profile/change-password', [BackendController::class, 'changePassword'])->name('changePassword');
+    // Contact info management routes
+// Route for viewing contact information
+Route::get('/admin/view-contact', [BackendController::class, 'showContactInfo'])->name('showContactInfo');
+
+    Route::post('/admin/update-contact-info', [BackendController::class, 'updateContactInfo'])->name('admin.updateContactInfo');
+    
 });
 
 
 
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::match(['get', 'post'], '/change-logo', [WebsiteController::class, 'changeLogo'])->name('changeLogo');
+    Route::get('/view-contact', [WebsiteController::class, 'viewContact'])->name('viewContact');
+    Route::get('/view-slider', [WebsiteController::class, 'viewSlider'])->name('viewSlider');
+    Route::match(['get', 'post'], '/change-slider', [WebsiteController::class, 'changeSlider'])->name('changeSlider');
+    Route::get('/branches', [WebsiteController::class, 'branches'])->name('branches');
+    Route::get('/view-about', [WebsiteController::class, 'viewAbout'])->name('viewAbout');
+    Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
 
-
-
+    
+});
 
 
 // Custom Registration Routes
 Route::get('/register', [RegistrationController::class, 'showForm'])->name('register.form');
-//oute::post('/register', [RegistrationController::class, 'register'])->name('register.submit');
 Route::get('/register/success', [RegistrationController::class, 'success'])->name('register.success');
 Route::post('/register', [RegistrationController::class, 'register'])->name('register.submit');
 

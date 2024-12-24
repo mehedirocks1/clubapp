@@ -82,7 +82,7 @@
                 <!-- Profile Picture -->
                 <div class="text-center mb-3">
                     @if($admin->photo)
-                        <img src="{{ asset('storage/photos/' . $admin->photo) }}" alt="Profile Picture" class="img-fluid rounded-circle" width="150">
+                    <img src="{{ asset($admin->photo) }}" alt="Profile Picture" class="img-fluid rounded-circle" width="150">
                     @else
                         <img src="https://via.placeholder.com/150" alt="Profile Picture" class="img-fluid rounded-circle" width="150">
                     @endif
@@ -96,4 +96,5 @@
             </div>
         </div>
     </div>
+
 @endsection

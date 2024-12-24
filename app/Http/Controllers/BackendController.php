@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail; 
 use App\Mail\ResetPasswordMail; // Assuming you have this Mail class
+use Illuminate\Support\Facades\Storage;
+
 
 class BackendController extends Controller
 {
@@ -73,122 +76,206 @@ class BackendController extends Controller
 
 
 
-     // Show Admin Profile
-     public function viewProfile()
-     {
-         $admin = auth()->user();
- 
-         // Manual role check (only allow if role_id is 1)
-         if ($admin->role_id != 1) {
-             abort(403, 'Unauthorized action.');
-         }
- 
-         return view('backend.admin.profile.view', compact('admin'));
-     }
- 
-     // Edit Admin Profile
-     public function editProfile()
-     {
-         $admin = auth()->user();
- 
-         // Manual role check (only allow if role_id is 1)
-         if ($admin->role_id != 1) {
-             abort(403, 'Unauthorized action.');
-         }
- 
-         return view('backend.admin.profile.edit', compact('admin'));
-     }
- 
-     // Update Admin Profile
-     public function updateProfile(Request $request)
-     {
-         $admin = auth()->user();
- 
-         // Manual role check (only allow if role_id is 1)
-         if ($admin->role_id != 1) {
-             abort(403, 'Unauthorized action.');
-         }
- 
-         // Validate the inputs for all fields
-         $validatedData = $request->validate([
-             'first_name' => 'required|string|max:255',
-             'last_name' => 'required|string|max:255',
-             'bangla_name' => 'nullable|string|max:255',
-             'email' => 'required|email|unique:users,email,' . $admin->id,
-             'mobile_number' => 'nullable|string|max:15',
-             'date_of_birth' => 'nullable|date',
-             'nid' => 'nullable|string|max:17',
-             'gender' => 'nullable|in:male,female,other',
-             'blood_group' => 'nullable|string|max:5',
-             'education' => 'nullable|string|max:255',
-             'profession' => 'nullable|string|max:255',
-             'skills' => 'nullable|string|max:255',
-             'country' => 'nullable|string|max:255',
-             'division' => 'nullable|string|max:255',
-             'district' => 'nullable|string|max:255',
-             'thana' => 'nullable|string|max:255',
-             'address' => 'nullable|string|max:500',
-             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-         ]);
- 
-         // Handle profile photo upload if exists
-         if ($request->hasFile('photo')) {
-             // Remove the old photo if any
-             if ($admin->photo && file_exists(public_path('uploads/' . $admin->photo))) {
-                 unlink(public_path('uploads/' . $admin->photo));
-             }
- 
-             // Store the new photo
-             $photoPath = $request->file('photo')->store('uploads', 'public');
-             $validatedData['photo'] = $photoPath;
-         }
- 
-         // Update profile data
-         $admin->update($validatedData);
- 
-         return redirect()->route('admin.viewProfile')->with('success', 'Profile updated successfully.');
-     }
- 
-     // Show Change Password Form
-     public function changePasswordForm()
-     {
-         $admin = auth()->user();
- 
-         // Manual role check (only allow if role_id is 1)
-         if ($admin->role_id != 1) {
-             abort(403, 'Unauthorized action.');
-         }
- 
-         return view('backend.admin.profile.change-password');
-     }
- 
-     // Change Admin Password
-     public function changePassword(Request $request)
-     {
-         $admin = auth()->user();
- 
-         // Manual role check (only allow if role_id is 1)
-         if ($admin->role_id != 1) {
-             abort(403, 'Unauthorized action.');
-         }
- 
-         // Validate the inputs
-         $validatedData = $request->validate([
-             'current_password' => 'required',
-             'password' => 'required|min:8|confirmed',
-         ]);
- 
-         // Check if the current password is correct
-         if (!Hash::check($request->current_password, $admin->password)) {
-             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
-         }
- 
-         // Update the password
-         $admin->update(['password' => Hash::make($request->password)]);
- 
-         return redirect()->route('admin.changePasswordForm')->with('success', 'Password changed successfully.');
-     }
 
 
 
+
+
+
+
+
+// Show Admin Profile
+ public function viewProfile()
+ {
+     $admin = auth()->user();
+
+     // Manual role check (only allow if role_id is 1)
+     if ($admin->role_id != 1) {
+         abort(403, 'Unauthorized action.');
+    }
+
+    return view('backend.admin.profile.view', compact('admin'));
 }
+
+/*
+public function viewProfile()
+{
+    $admin = auth()->user();
+
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $contactInfo = Contact::first();
+
+    if (!$contactInfo) {
+    
+        $contactInfo = null;
+    }
+
+    return view('backend.admin.profile.view', compact('admin', 'contactInfo'));
+}
+*/
+
+
+// Edit Admin Profile
+public function editProfile()
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    return view('backend.admin.profile.edit', compact('admin'));
+}
+
+
+public function updateProfile(Request $request)
+{
+    
+    // Validate incoming request data
+    $validatedData = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+        'mobile_number' => 'required|numeric',
+        'nid' => 'required|string|max:17', // Changed to match your input name 'nid'
+        'dob' => 'required|date', // Changed to match your input name 'dob'
+        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'gender' => 'required|string',
+        'blood_group' => 'nullable|string|max:5',
+        'education' => 'nullable|string|max:255',
+        'profession' => 'nullable|string|max:255',
+        'skills' => 'nullable|string|max:255',
+        'country' => 'required|string|max:255',
+        'division' => 'required|string|max:255',
+        'district' => 'required|string|max:255',
+        'thana' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
+    ]);
+   // dd($validatedData);
+    // Find the logged-in user
+    $admin = auth()->user();
+
+    // Handle photo upload if there's a new one
+    if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+        // Remove old photo if exists
+        if ($admin->photo) {
+            $oldPhotoPath = public_path('profilepics/' . $admin->photo); // Get full path to the old photo
+            if (file_exists($oldPhotoPath)) {
+                // Delete the old photo if it exists
+                unlink($oldPhotoPath);
+            }
+        }
+
+        // Store the new photo with a unique name
+        $timestamp = time();
+        $photoName = $request->first_name . '_' . $timestamp . '.' . $request->file('photo')->getClientOriginalExtension(); // Combine first name and timestamp
+
+        // Store the file directly in the 'public/profilepics' directory
+        $photoPath = $request->file('photo')->move(public_path('profilepics'), $photoName); // Store the file in the public folder
+
+        // Add the photo path to validated data array (relative path for the database)
+        $validatedData['photo'] = 'profilepics/' . $photoName; // store path relative to 'public'
+    }
+
+    // Update the user's profile with validated data
+    $admin->update($validatedData);
+
+    // Redirect to the profile view page with a success message
+    return redirect()->route('admin.viewProfile')->with('success', 'Profile updated successfully.');
+}
+
+
+
+
+// Show Change Password Form
+public function changePasswordForm()
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    return view('backend.admin.profile.change-password');
+}
+
+
+
+// Change Admin Password
+public function changePassword(Request $request)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Validate the inputs
+    $validatedData = $request->validate([
+        'current_password' => 'required',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    // Check if the current password is correct
+    if (!Hash::check($request->current_password, $admin->password)) {
+        return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+    }
+
+    // Update the password
+    $admin->update(['password' => Hash::make($request->password)]);
+
+    return redirect()->route('admin.changePasswordForm')->with('success', 'Password changed successfully.');
+}
+
+
+public function showContactInfo()
+{
+    // Fetch the first contact record
+    $contactInfo = Contact::first();
+
+    // If no contact info is found, assign null (or handle differently)
+    if (!$contactInfo) {
+        $contactInfo = null; 
+    }
+
+    // Pass the contact information to the view
+    return view('backend.admin.view-contact', compact('contactInfo'));
+}
+
+
+
+    // Method to update contact information
+    public function updateContactInfo(Request $request)
+    {
+        // Validate the request data
+        $validated = $request->validate([
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'working_hours' => 'nullable|string|max:255',
+        ]);
+
+        // Fetch the first contact entry
+        $contactInfo = Contact::first();
+
+        // Update the contact information with validated data
+        $contactInfo->update($validated);
+
+        // Redirect back to the edit page with a success message
+        return redirect()->route('admin.editContactInfo')->with('success', 'Contact information updated successfully!');
+    }
+}
+
+
+
+
+
+
+
+
+    
