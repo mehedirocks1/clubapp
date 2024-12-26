@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Branches</h1>
-    
+
     @if ($branches->isEmpty())
         <p>No branches found.</p>
     @else
@@ -18,8 +18,7 @@
                         <th>Email</th>
                         <th>Working Hours</th>
                         <th>Image</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
+                        <th>Actions</th> <!-- Action column with icons -->
                     </tr>
                 </thead>
                 <tbody>
@@ -34,13 +33,27 @@
                             <td>{{ $branch->working_hours }}</td>
                             <td>
                                 @if ($branch->image)
-                                    <img src="{{ asset('storage/' . $branch->image) }}" alt="Branch Image" width="100">
+                                    <img src="{{ asset('assets/images/branches/' . $branch->image) }}" alt="Branch Image" width="100">
                                 @else
                                     No Image
                                 @endif
                             </td>
-                            <td>{{ $branch->created_at->format('Y-m-d H:i:s') }}</td>
-                            <td>{{ $branch->updated_at->format('Y-m-d H:i:s') }}</td>
+                            <td>
+                                <a href="{{ route('admin.createBranch') }}" class="btn btn-warning" title="Add Branch">
+                                    <i class="bi bi-plus-circle"></i>
+                                </a>
+                                <a href="{{ route('admin.editBranch', ['id' => $branch->id]) }}" class="btn btn-warning" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
+                                <form action="{{ route('admin.deleteBranch', ['id' => $branch->id]) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this branch?')" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -49,22 +62,6 @@
     @endif
 @endsection
 
-@section('styles')
-    <style>
-        /* Optional: Add some padding and border for better design */
-        .table td, .table th {
-            padding: 12px;
-            vertical-align: middle;
-        }
-
-        /* Optional: Add hover effect for rows */
-        tbody tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Optional: Add style for image */
-        img {
-            border-radius: 8px;
-        }
-    </style>
+@section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
 @endsection

@@ -1,38 +1,40 @@
-@extends('frontend.layout.app') <!-- Extend the app layout -->
+@extends('frontend.layout.app')
 
-@section('title', 'Contact Us') <!-- Set the title for the page -->
+@section('title', 'Contact Us')
 
-@section('content') <!-- Section for the page content -->
-
+@section('content')
 <div class="container my-5">
   <h2 class="text-center mb-4">Contact Us</h2>
 
+  @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+
   <div class="row">
-    <!-- Contact Form -->
     <div class="col-md-8">
       <h4>Send us a Message</h4>
-      <form>
+      <form method="POST" action="{{ route('frontend.contact') }}">
+        @csrf
         <div class="mb-3">
-          <label for="name" class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="name" required>
+          <label for="full_name" class="form-label">Full Name</label>
+          <input type="text" name="full_name" class="form-control" id="full_name" required>
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="email" required>
+          <input type="email" name="email" class="form-control" id="email" required>
         </div>
         <div class="mb-3">
           <label for="subject" class="form-label">Subject</label>
-          <input type="text" class="form-control" id="subject" required>
+          <input type="text" name="subject" class="form-control" id="subject" required>
         </div>
         <div class="mb-3">
           <label for="message" class="form-label">Message</label>
-          <textarea class="form-control" id="message" rows="4" required></textarea>
+          <textarea name="message" class="form-control" id="message" rows="4" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Send Message</button>
       </form>
     </div>
 
-    <!-- Contact Information -->
     <div class="col-md-4">
       <h4>Our Contact Information</h4>
       <ul class="list-unstyled">
@@ -43,5 +45,4 @@
     </div>
   </div>
 </div>
-
-@endsection <!-- End the content section -->
+@endsection

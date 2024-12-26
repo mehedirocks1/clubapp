@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Branch;
 use App\Models\Contact; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request; 
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail; 
 use App\Mail\ResetPasswordMail; // Assuming you have this Mail class
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\WebsiteController;
+use App\Http\Controllers\MemberController;
 
 
 class BackendController extends Controller
@@ -214,36 +217,6 @@ public function changePassword(Request $request)
 
     return redirect()->route('admin.changePasswordForm')->with('success', 'Password changed successfully.');
 }
-
-
-/*
-public function showContacts()
-{
-    // Get the currently authenticated user
-    $admin = auth()->user();
-
-    // Manual role check (only allow if role_id is 1)
-    if ($admin->role_id != 1) {
-        abort(403, 'Unauthorized action.');
-    }
-
-    // Fetch only the 'email' field from the Contact model
-    $emails = Contact::pluck('email');
-
-    // Log to check if data is fetched
-    Log::info('Fetched Emails:', ['emails' => $emails]);
-
-    // Debugging - ensure emails are fetched properly
-    if ($emails->isEmpty()) {
-        Log::warning('No emails found!');
-    }
-
-    // Return the view with the 'emails' data
-    return view('backend.admin.view-contact', ['emails' => $emails]);
-// Passing data in a different format
-}
-*/
-
 
 
 
