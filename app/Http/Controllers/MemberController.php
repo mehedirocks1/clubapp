@@ -1,131 +1,194 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Branch;
+use App\Models\Contact; 
+use Illuminate\Support\Facades\Log; 
+use App\Mail\ResetPasswordMail; // Assuming you have this Mail class
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\WebsiteController;
+use App\Http\Controllers\MemberController;
+
 
 class MemberController extends Controller
+{ 
+
+// View all members
+public function viewMembers()
 {
+    $admin = auth()->user();
 
-    
-    public function viewMembers()
-    {
-        // Fetch all users (or paginate them)
-        $members = User::all();
-
-        // Return the view with members data
-        return view('backend.admin.view-members', compact('members'));
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Validate the request data
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'mobile_number' => 'required|string|max:20',
-        ]);
+    $members = User::all();
+    return view('backend.admin.view-members', compact('members'));
+}
 
-        // Create a new user
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'mobile_number' => $request->mobile_number,
-            'status' => 1, // Default active status
-        ]);
+// View a single member's details
+public function viewMember($id)
+{
+    $admin = auth()->user();
 
-        // Return to the users index route with a success message
-        return redirect()->route('admin.viewMembers')->with('success', 'User created successfully.');
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        // Fetch the user (member) by ID
-        $member = User::findOrFail($id);
+    $member = User::findOrFail($id);
+    return view('backend.admin.view-member', compact('member'));
+}
 
-        // Return the view with the member data
-        return view('backend.admin.view-member', compact('member'));
+// Download a member's details as a PDF
+public function downloadMember($id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        // Fetch the user (member) by ID
-        $member = User::findOrFail($id);
+    $member = User::findOrFail($id);
+    $pdf = Pdf::loadView('backend.admin.member-pdf', compact('member'));
+    return $pdf->download("member_{$member->id}.pdf");
+}
 
-        // Return the edit view with member data
-        return view('backend.admin.edit-member', compact('member'));
+// Reset a member's password
+public function resetPassword(Request $request, $id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        // Validation for the user fields
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id, // Ensure email is unique, ignoring the current user ID
-            'mobile_number' => 'required|string|max:20',
-            'status' => 'required|boolean',
-        ]);
+    $user = User::findOrFail($id);
 
-        // Find the user by ID
-        $user = User::findOrFail($id);
+    $newPassword = Str::random(10);
+    $user->password = Hash::make($newPassword);
+    $user->save();
 
-        // Update the user data with validated input
-        $user->update($request->only(['first_name', 'last_name', 'email', 'mobile_number', 'status']));
+    Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $newPassword));
 
-        // Redirect back with a success message
-        return redirect()->route('admin.viewMembers')->with('success', 'User updated successfully.');
+    return redirect()->back()->with('success', 'Password reset successfully. New password sent to user\'s email.');
+}
+
+// Send a message to a member
+public function sendMessage(Request $request, $id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        // Find the user by ID
-        $user = User::findOrFail($id);
+    $member = User::findOrFail($id);
 
-        // Prevent the logged-in user (admin) from deleting their own account
-        if (auth()->id() == $user->id) {
-            return redirect()->route('backend.admin.dashboard')->with('error', 'You cannot delete your own account.');
+    $request->validate([
+        'message' => 'required|string',
+    ]);
+
+    // Assuming Notification or Mail system for message sending
+    // \Notification::send($member, new MemberMessageNotification($request->message));
+
+    return redirect()->back()->with('success', 'Message sent successfully.');
+}
+
+// Update member's status (active/inactive toggle)
+public function updateStatus($id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $member = User::findOrFail($id);
+    $member->status = !$member->status;
+    $member->save();
+
+    return redirect()->route('admin.viewMembers')->with('success', 'User status updated successfully.');
+}
+
+// Edit member's details
+public function edit($id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $member = User::findOrFail($id);
+    return view('backend.admin.edit-member', compact('member'));
+}
+
+// Update member's details after editing
+public function update(Request $request, $id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $member = User::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'phone' => 'nullable|string|max:20',
+        'status' => 'required|boolean',
+    ]);
+
+    $member->update($request->all());
+
+    return redirect()->route('admin.viewMembers')->with('success', 'Member details updated successfully.');
+}
+
+// Delete a member
+public function destroy($id)
+{
+    $admin = auth()->user();
+
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Find the member by ID
+    $member = User::findOrFail($id);
+
+    // Check and delete the member's image if it exists
+    if ($member->profile_picture) { // Assuming 'profile_picture' is the column for storing the image filename
+        $imagePath = public_path('profilepics/' . $member->profile_picture);
+        if (file_exists($imagePath)) {
+            unlink($imagePath); // Delete the image file
         }
-
-        // Proceed with deletion if not the logged-in admin
-        $user->delete();
-
-        // Redirect back with a success message
-        return redirect()->route('admin.viewMembers')->with('success', 'User deleted successfully.');
     }
 
-    /**
-     * Update the status of the specified user.
-     */
-    public function updateStatus($id)
-    {
-        // Find the user by ID
-        $user = User::findOrFail($id);
+    // Delete the member record from the database
+    $member->delete();
 
-        // Toggle the status between active (1) and inactive (0)
-        $user->status = $user->status == 1 ? 0 : 1;
+    // Redirect back with success message
+    return redirect()->route('admin.viewMembers')->with('success', 'Member deleted successfully.');
+}
 
-        // Save the updated status
-        $user->save();
 
-        // Redirect back with a success message
-        return redirect()->route('admin.viewMembers')->with('success', 'User status updated successfully.');
-    }
+
 }

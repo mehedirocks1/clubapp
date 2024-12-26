@@ -30,39 +30,31 @@
             <td>{{ $member->district }}</td>
             <td>{{ $member->address }}</td>
             <td>
-              <form action="{{ route('admin.members.updateStatus', $member->id) }}" method="POST">
-                  @csrf
-                  @method('PUT') 
-                  <button type="submit" class="btn btn-sm {{ $member->status == 1 ? 'btn-success' : 'btn-danger' }}">
-                      <i class="bi {{ $member->status == 1 ? 'bi-check-circle' : 'bi-x-circle' }}"></i>
-                  </button>
+              <form action="{{ route('admin.updateStatus', $member->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <button type="submit" class="btn btn-sm {{ $member->status == 1 ? 'btn-success' : 'btn-danger' }}">
+                  <i class="bi {{ $member->status == 1 ? 'bi-check-circle' : 'bi-x-circle' }}"></i>
+                </button>
               </form>
             </td>
             <td>
-              <a href="{{ route('admin.members.edit', $member->id) }}" class="btn btn-sm btn-primary"><i class="bi bi-pencil-square"></i></a> 
-              <a href="{{ route('admin.members.show', $member->id) }}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-              <a href="#" class="btn btn-sm btn-success"><i class="bi bi-chat-text"></i></a> 
-              <a href="#" class="btn btn-sm btn-warning"><i class="bi bi-envelope"></i></a>
-
-              <!-- Delete Link -->
-              <a href="#" class="btn btn-sm btn-danger" onclick="event.preventDefault(); confirmDelete({{ $member->id }});">
-                  <i class="bi bi-trash"></i>
+              <a href="{{ route('admin.editMember', $member->id) }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-pencil-square"></i>
               </a>
-
-              <!-- Confirmation Modal (Hidden by default) -->
-              <div id="confirmationModal" class="modal" style="display: none;">
-                  <div class="modal-content">
-                      <p>Are you sure you want to delete this member?</p>
-                      <button id="confirmDeleteBtn" class="btn btn-danger" onclick="submitDelete();">Yes, Delete</button>
-                      <button id="cancelDeleteBtn" class="btn btn-secondary" onclick="cancelDelete();">Cancel</button>
-                  </div>
-              </div>
-
-              <!-- Delete Form (Hidden) -->
-              <form id="delete-form" action="" method="POST" style="display: none;">
-                  @csrf
-                  @method('DELETE')
-              </form>
+              <a href="{{ route('admin.viewMember', $member->id) }}" class="btn btn-sm btn-info">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ route('admin.sendMessage', $member->id) }}" class="btn btn-sm btn-success">
+                <i class="bi bi-chat-text"></i>
+              </a>
+              <a href="{{ route('admin.downloadMember', $member->id) }}" class="btn btn-sm btn-warning">
+                <i class="bi bi-download"></i>
+              </a>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                      onclick="setDeleteAction('{{ route('admin.destroy', $member->id) }}')')">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
           @empty
@@ -75,23 +67,35 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this member?
+      </div>
+      <div class="modal-footer">
+        <form id="delete-form" action="" method="POST">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
+@section('scripts')
 <script>
-    function confirmDelete(id) {
-        // Show the modal
-        document.getElementById('confirmationModal').style.display = 'block';
-        // Set the action URL dynamically based on the member ID
-        document.getElementById('delete-form').action = '/admin/members/' + id;
-    }
-
-    function submitDelete() {
-        // Submit the form to delete the member
-        document.getElementById('delete-form').submit();
-    }
-
-    function cancelDelete() {
-        // Close the modal
-        document.getElementById('confirmationModal').style.display = 'none';
-    }
+  function setDeleteAction(actionUrl) {
+    document.getElementById('delete-form').action = actionUrl;
+  }
 </script>
+@endsection

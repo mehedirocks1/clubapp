@@ -48,13 +48,20 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
+
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard/view-members', [BackendController::class, 'viewMembers'])->name('viewMembers');
-    Route::get('/dashboard/view-member/{id}', [BackendController::class, 'viewMember'])->name('viewMember');
-    Route::get('/dashboard/download-member/{id}', [BackendController::class, 'downloadMember'])->name('downloadMember');
-    Route::get('/dashboard/reset-password/{id}', [BackendController::class, 'resetPassword'])->name('resetPassword');
-    Route::get('/dashboard/send-message/{id}', [BackendController::class, 'sendMessage'])->name('sendMessage');
+    Route::get('members', [MemberController::class, 'viewMembers'])->name('viewMembers');
+    Route::get('members/{id}', [MemberController::class, 'viewMember'])->name('viewMember');
+    Route::get('members/{id}/download', [MemberController::class, 'downloadMember'])->name('downloadMember');
+    Route::put('members/{id}/reset-password', [MemberController::class, 'resetPassword'])->name('resetPassword');
+    Route::post('members/{id}/send-message', [MemberController::class, 'sendMessage'])->name('sendMessage');
+    Route::put('members/{id}/status', [MemberController::class, 'updateStatus'])->name('updateStatus');
+    Route::get('members/{id}/edit', [MemberController::class, 'edit'])->name('editMember');
+    Route::put('members/{id}', [MemberController::class, 'update'])->name('updateMember');
+    Route::delete('members/{id}', [MemberController::class, 'destroy'])->name('destroy');
 });
+
+
 
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
