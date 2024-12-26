@@ -17,9 +17,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('subject');
             $table->text('message');
-            $table->string('address')->nullable(); // Added address field
-            $table->string('phone')->nullable(); // Added phone field
-            $table->string('working_hours')->nullable(); // Added working_hours field
             $table->timestamps();
         });
     }

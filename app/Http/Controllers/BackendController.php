@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Contact;
+use App\Models\Contact; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,7 @@ class BackendController extends Controller
     public function viewMembers()
     {
         $members = User::all(); 
-        Log::debug('Fetched Members:', ['members' => $members]); 
+        //Log::debug('Fetched Members:', ['members' => $members]); 
         return view('backend.admin.view-members', compact('members'));
     }
 
@@ -97,25 +97,7 @@ class BackendController extends Controller
     return view('backend.admin.profile.view', compact('admin'));
 }
 
-/*
-public function viewProfile()
-{
-    $admin = auth()->user();
 
-    if ($admin->role_id != 1) {
-        abort(403, 'Unauthorized action.');
-    }
-
-    $contactInfo = Contact::first();
-
-    if (!$contactInfo) {
-    
-        $contactInfo = null;
-    }
-
-    return view('backend.admin.profile.view', compact('admin', 'contactInfo'));
-}
-*/
 
 
 // Edit Admin Profile
@@ -234,41 +216,37 @@ public function changePassword(Request $request)
 }
 
 
-public function showContactInfo()
+/*
+public function showContacts()
 {
-    // Fetch the first contact record
-    $contactInfo = Contact::first();
+    // Get the currently authenticated user
+    $admin = auth()->user();
 
-    // If no contact info is found, assign null (or handle differently)
-    if (!$contactInfo) {
-        $contactInfo = null; 
+    // Manual role check (only allow if role_id is 1)
+    if ($admin->role_id != 1) {
+        abort(403, 'Unauthorized action.');
     }
 
-    // Pass the contact information to the view
-    return view('backend.admin.view-contact', compact('contactInfo'));
+    // Fetch only the 'email' field from the Contact model
+    $emails = Contact::pluck('email');
+
+    // Log to check if data is fetched
+    Log::info('Fetched Emails:', ['emails' => $emails]);
+
+    // Debugging - ensure emails are fetched properly
+    if ($emails->isEmpty()) {
+        Log::warning('No emails found!');
+    }
+
+    // Return the view with the 'emails' data
+    return view('backend.admin.view-contact', ['emails' => $emails]);
+// Passing data in a different format
 }
+*/
 
 
 
-    // Method to update contact information
-    public function updateContactInfo(Request $request)
-    {
-        // Validate the request data
-        $validated = $request->validate([
-            'address' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:255',
-            'working_hours' => 'nullable|string|max:255',
-        ]);
 
-        // Fetch the first contact entry
-        $contactInfo = Contact::first();
-
-        // Update the contact information with validated data
-        $contactInfo->update($validated);
-
-        // Redirect back to the edit page with a success message
-        return redirect()->route('admin.editContactInfo')->with('success', 'Contact information updated successfully!');
-    }
 }
 
 

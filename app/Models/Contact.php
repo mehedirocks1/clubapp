@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
 
 class Contact extends Model
 {
@@ -15,8 +18,5 @@ class Contact extends Model
         'email',
         'subject',
         'message',
-        'address',
-        'phone',
-        'working_hours',
     ];
 }

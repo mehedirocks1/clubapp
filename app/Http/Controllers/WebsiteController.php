@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use App\Models\Contact;
+use App\Models\Branch;
 
 class WebsiteController extends Controller
 {
@@ -40,14 +42,15 @@ class WebsiteController extends Controller
     }
 
 
+ // Website Content Management
+ public function viewContact()
+ {
+     // Fetch all contacts from the database
+     $contacts = Contact::all(); // Fetch all contacts
 
-    public function viewContact()
-    {
-        return view('backend.admin.view-contact');
-    }
-
-
-
+     // Pass the contacts to the view
+     return view('backend.admin.view-contact', ['contacts' => $contacts]);
+ }
 
 
 
@@ -94,9 +97,16 @@ class WebsiteController extends Controller
 
 
     public function branches()
-    {
-        return view('backend.admin.branches');
-    }
+{
+    // Fetch all branches from the Branch model
+    $branches = Branch::all(); // Make sure you have the Branch model created
+
+    // Pass branches data to the view
+    return view('backend.admin.view-branches', ['branches' => $branches]);
+}
+
+
+
 
     public function viewAbout()
     {

@@ -21,9 +21,6 @@ class ContactFactory extends Factory
             'email' => $this->faker->unique()->safeEmail,
             'subject' => $this->faker->sentence,
             'message' => $this->faker->paragraph,
-            'address' => $this->faker->address,
-            'phone' => $this->faker->phoneNumber,
-            'working_hours' => 'Mon-Fri, 9 AM - 6 PM',
         ];
     }
 }
