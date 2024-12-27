@@ -51,8 +51,9 @@
               <a href="{{ route('admin.downloadMember', $member->id) }}" class="btn btn-sm btn-warning">
                 <i class="bi bi-download"></i>
               </a>
+              <!-- Trigger the delete modal -->
               <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                      onclick="setDeleteAction('{{ route('admin.destroy', $member->id) }}')')">
+                      onclick="setDeleteAction('{{ route('admin.destroyMember', $member->id) }}')">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -80,16 +81,19 @@
         Are you sure you want to delete this member?
       </div>
       <div class="modal-footer">
-        <form id="delete-form" action="" method="POST">
-          @csrf
-          @method('DELETE')
-          <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        </form>
+      <form id="delete-form" action="{{ route('admin.destroyMember', $member->id) }}" method="POST">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+</form>
+
+
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
 </div>
+
 @endsection
 
 @section('scripts')
@@ -98,4 +102,6 @@
     document.getElementById('delete-form').action = actionUrl;
   }
 </script>
+
+
 @endsection

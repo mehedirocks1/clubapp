@@ -48,6 +48,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
+/*
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('members', [MemberController::class, 'viewMembers'])->name('viewMembers');
@@ -58,8 +59,45 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('members/{id}/status', [MemberController::class, 'updateStatus'])->name('updateStatus');
     Route::get('members/{id}/edit', [MemberController::class, 'edit'])->name('editMember');
     Route::put('members/{id}', [MemberController::class, 'update'])->name('updateMember');
+    //Route::delete('members/{id}', [MemberController::class, 'destroy'])->name('destroy');
     Route::delete('members/{id}', [MemberController::class, 'destroy'])->name('destroy');
 });
+
+*/
+
+
+
+Route::middleware('auth')->prefix('admin')->group(function () {
+    // Delete a member
+    //Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('admin.destroyMember');
+    
+    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('admin.destroyMember');
+
+    // View all members
+    Route::get('/members', [MemberController::class, 'viewMembers'])->name('admin.viewMembers');
+    
+    // Update member status
+    Route::put('/members/{id}/status', [MemberController::class, 'updateStatus'])->name('admin.updateStatus');
+    
+    // Edit a member
+    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('admin.editMember');
+    
+    
+    // View a single member
+    Route::get('/members/{id}/view', [MemberController::class, 'viewMember'])->name('admin.viewMember');
+    
+    // Download a member's details as PDF
+    Route::get('/members/{id}/download', [MemberController::class, 'downloadMember'])->name('admin.downloadMember');
+    
+    // Send a message to a member
+    Route::post('/members/{id}/message', [MemberController::class, 'sendMessage'])->name('admin.sendMessage');
+    
+    // Update a member's details
+    Route::put('/members/{id}', [MemberController::class, 'update'])->name('admin.updateMember');
+    
+});
+
+
 
 
 
