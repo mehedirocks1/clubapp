@@ -149,7 +149,7 @@ public function changePassword(Request $request)
     // Update the password
     $admin->update(['password' => Hash::make($request->password)]);
 
-    return redirect()->route('admin.changePasswordForm')->with('success', 'Password changed successfully.');
+    return redirect()->route('admin.viewProfile')->with('success', 'Password changed successfully.');
 }
 
 

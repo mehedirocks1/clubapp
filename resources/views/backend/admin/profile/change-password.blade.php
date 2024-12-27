@@ -12,7 +12,7 @@
                         <!-- Change Password Form -->
                         <form action="{{ route('admin.changePassword') }}" method="POST">
                             @csrf
-                            @method('POST')
+                            @method('PUT')
 
                             <!-- Current Password -->
                             <div class="form-group mb-4">

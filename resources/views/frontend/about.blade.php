@@ -1,19 +1,21 @@
-@extends('frontend.layout.app') <!-- Extend the app layout -->
+@extends('frontend.layout.app')
 
-@section('title', 'About Us') <!-- Set the title for the page -->
+@section('title', 'About Us')
 
-@section('content') <!-- Section for the page content -->
+@section('content')
 
 <!-- About Section -->
 <section class="about-us py-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-6">
-                <h2 class="display-4">About Us</h2>
-                <p class="lead">We are a team of professionals dedicated to providing the best solutions for your business. Our mission is to innovate, create, and deliver exceptional results.</p>
+                <!-- Display Heading and Description -->
+                <h2 class="display-4">{{ $aboutUs->heading ?? 'About Us' }}</h2>
+                <p class="lead">{{ $aboutUs->description ?? 'We are a team of professionals dedicated to providing the best solutions for your business. Our mission is to innovate, create, and deliver exceptional results.' }}</p>
             </div>
             <div class="col-lg-6">
-                <img src="https://via.placeholder.com/500x300" class="img-fluid rounded" alt="About Us">
+                <!-- Display Image -->
+                <img src="{{ asset('assets/images/aboutimages/' . $aboutUs->image) ?? 'https://via.placeholder.com/500x300' }}" class="img-fluid rounded" alt="About Us">
             </div>
         </div>
     </div>
@@ -24,37 +26,20 @@
     <div class="container">
         <h2 class="text-center mb-4">Meet Our Team</h2>
         <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="Team Member 1">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">John Doe</h5>
-                        <p class="card-text">CEO & Founder</p>
+            @foreach($teamMembers as $member)
+                <div class="col-md-4">
+                    <div class="card">
+                        <!-- Corrected Image Path with Fallback -->
+                        <img src="{{ asset('assets/images/team/' . $member->image) ?? 'https://via.placeholder.com/500x300' }}" class="card-img-top" alt="{{ $member->name }}">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ $member->name }}</h5>
+                            <p class="card-text">{{ $member->role }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="Team Member 2">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Jane Smith</h5>
-                        <p class="card-text">CTO</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="Team Member 3">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Alice Brown</h5>
-                        <p class="card-text">Lead Developer</p>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
 
-
-
-@endsection <!-- End the content section -->
+@endsection

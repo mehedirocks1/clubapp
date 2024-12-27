@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Models\Contact;
 use App\Models\Branch;
+use App\Models\Team;
+use App\Models\AboutUs;
+
 
 
 class FrontendController extends Controller
@@ -18,7 +21,14 @@ class FrontendController extends Controller
     // Show About Page
     public function about()
     {
-        return view('frontend.about');
+        // Fetch all team members
+        $teamMembers = Team::all();
+        
+        // Fetch the AboutUs data (assuming only one record exists in the 'about_us' table)
+        $aboutUs = AboutUs::first();  // Assuming you only have one record for the AboutUs
+
+        // Return the view with both the AboutUs and Team data
+        return view('frontend.about', compact('teamMembers', 'aboutUs'));
     }
 
 
@@ -75,6 +85,11 @@ class FrontendController extends Controller
     {
         return view('frontend.registration');
     }
+
+
+
+// Add this method to show the team
+
 
 
 

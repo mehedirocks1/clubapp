@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\Team;
 use App\Models\Branch;
 use App\Models\Gallery;
 use App\Models\Contact;
@@ -108,14 +109,38 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/view-slider', [WebsiteController::class, 'viewSlider'])->name('viewSlider');
     Route::match(['get', 'post'], '/change-slider', [WebsiteController::class, 'changeSlider'])->name('changeSlider');
     Route::get('/branches', [WebsiteController::class, 'branches'])->name('branches');
-    Route::get('/view-about', [WebsiteController::class, 'viewAbout'])->name('viewAbout');
+    //Route::get('/view-about', [WebsiteController::class, 'viewAbout'])->name('viewAbout');
     Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
     Route::get('/create-branch', [WebsiteController::class, 'createBranch'])->name('createBranch');
     Route::post('/store-branch', [WebsiteController::class, 'storeBranch'])->name('storeBranch');
     Route::get('/edit-branch/{id}', [WebsiteController::class, 'editBranch'])->name('editBranch');
     Route::put('/update-branch/{id}', [WebsiteController::class, 'updateBranch'])->name('updateBranch');
     Route::delete('/delete-branch/{id}', [WebsiteController::class, 'destroyBranch'])->name('deleteBranch');
+
+
+
+    Route::get('/view-about', [WebsiteController::class, 'viewAbout'])->name('viewAbout');
+    Route::match(['get', 'post'], '/store-about', [WebsiteController::class, 'storeAbout'])->name('storeAbout');
+    Route::get('/edit-about/{id}', [WebsiteController::class, 'editAbout'])->name('editAbout');
+    Route::put('/update-about/{id}', [WebsiteController::class, 'updateAbout'])->name('updateAbout');
+    Route::delete('/delete-about/{id}', [WebsiteController::class, 'destroyAbout'])->name('deleteAbout');
+
+
+
+
+
+    Route::get('/view-team', [WebsiteController::class, 'viewTeam'])->name('viewTeam');
+    Route::get('/create-team', [WebsiteController::class, 'createTeam'])->name('createTeam');
+    Route::post('/store-team', [WebsiteController::class, 'storeTeam'])->name('storeTeam');
+    Route::get('/edit-team/{id}', [WebsiteController::class, 'editTeam'])->name('editTeam');
+    Route::put('/update-team/{id}', [WebsiteController::class, 'updateTeam'])->name('updateTeam');
+    Route::delete('/delete-team/{id}', [WebsiteController::class, 'destroyTeam'])->name('deleteTeam');
 });
+
+
+
+
+
 
 
 // Registration Routes

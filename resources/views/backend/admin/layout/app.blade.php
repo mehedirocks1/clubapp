@@ -45,6 +45,7 @@
                             <a href="{{ route('admin.viewContact') }}" class="nav-link">View Contact</a>
                             <a href="{{ route('admin.viewSlider') }}" class="nav-link">View Slider</a>
                             <a href="{{ route('admin.viewAbout') }}" class="nav-link">View About</a>
+                            <a href="{{ route('admin.viewTeam') }}" class="nav-link">View Team</a>
                         </div>
                     </li>
 
@@ -56,16 +57,14 @@
                         </div>
                     </li>
 
-                  <!-- Branches -->
-<!-- Branches -->
-<li class="nav-item">
-    <a href="#branchesMenu" data-bs-toggle="collapse">Branches</a>
-    <div class="collapse submenu" id="branchesMenu">
-        <a href="{{ route('admin.branches') }}" class="nav-link">View Branches</a> <!-- Corrected link -->
-        <a href="{{ route('admin.createBranch') }}" class="nav-link">Add Branches</a> <!-- Link for adding branches -->
-    </div>
-</li>
-
+                    <!-- Branches -->
+                    <li class="nav-item">
+                        <a href="#branchesMenu" data-bs-toggle="collapse">Branches</a>
+                        <div class="collapse submenu" id="branchesMenu">
+                            <a href="{{ route('admin.branches') }}" class="nav-link">View Branches</a>
+                            <a href="{{ route('admin.createBranch') }}" class="nav-link">Add Branches</a>
+                        </div>
+                    </li>
 
                     <!-- Gallery -->
                     <li class="nav-item">
@@ -101,16 +100,38 @@
         </div>
     </div>
 
+    <!-- Success Alert Modal -->
+    @if(session('success'))
+        <div class="modal fade show" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="successModalLabel">Success</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ session('success') }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Initialize Modal on Page Load (if session success exists) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success'))
+                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            @endif
+        });
+    </script>
+
 </body>
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-@endif
-
 </html>

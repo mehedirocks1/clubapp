@@ -12,6 +12,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BackendController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\MemberController;
+use App\Models\AboutUs;
+use App\Models\Team;
 
 class WebsiteController extends Controller
 {
@@ -220,13 +222,226 @@ class WebsiteController extends Controller
         // Redirect back with a success message
         return redirect()->route('admin.branches')->with('success', 'Branch deleted successfully!');
     }
+
+    /*
     public function viewAbout()
     {
         return view('backend.admin.view-about');
     }
-
+*/
     public function gallery()
     {
         return view('backend.admin.gallery');
     }
+
+
+// View all AboutUs data
+public function viewAbout()
+{
+    $aboutUs = AboutUs::all(); // Retrieve all AboutUs entries
+    return view('backend.admin.view-about', compact('aboutUs'));
+}
+
+public function storeAbout(Request $request)
+{
+    // Validate input
+    $validated = $request->validate([
+        'heading' => 'required|string|max:255',
+        'description' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,bmp|max:2048',
+    ]);
+
+    // Handle image upload
+    if ($request->hasFile('image')) {
+        // Get the original file name
+        $imageName = time() . '.' . $request->image->extension(); 
+        
+        // Move the image to the specified directory
+        $request->image->move(public_path('assets/images/aboutimages'), $imageName);
+        
+        // Save the image name to the database
+        $imagePath = 'assets/images/aboutimages/' . $imageName; // Save relative path
+    } else {
+        $imagePath = null; // Handle no image upload
+    }
+
+    // Store new AboutUs entry
+    AboutUs::create([
+        'heading' => $validated['heading'],
+        'description' => $validated['description'],
+        'image' => $imagePath, // Store the path
+    ]);
+
+    return redirect()->route('admin.viewAbout')->with('success', 'About Us entry added successfully.');
+}
+
+// Edit existing AboutUs data
+public function editAbout($id)
+{
+    $aboutUs = AboutUs::findOrFail($id);
+    return view('backend.admin.edit-about', compact('aboutUs'));
+}
+
+public function updateAbout(Request $request, $id)
+{
+    $validated = $request->validate([
+        'heading' => 'required|string|max:255',
+        'description' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,bmp|max:2048',
+    ]);
+
+    $aboutUs = AboutUs::findOrFail($id);
+
+    // Handle image upload with move() for more control
+    if ($request->hasFile('image')) {
+        // Delete the old image if it exists
+        if ($aboutUs->image && file_exists(public_path($aboutUs->image))) {
+            unlink(public_path($aboutUs->image)); // Remove the old image
+        }
+
+        // Get the new image and its name
+        $image = $request->file('image');
+        $imageName = time() . '.' . $image->extension(); // Generate a unique name for the new image
+        $imagePath = public_path('assets/images/aboutimages'); // Target folder for the image
+
+        // Move the image to the target folder
+        $image->move($imagePath, $imageName);
+        $imagePath = 'assets/images/aboutimages/' . $imageName; // Save relative path
+    } else {
+        $imagePath = $aboutUs->image; // Keep the old image if no new one uploaded
+    }
+
+    // Update AboutUs entry in the database
+    $aboutUs->update([
+        'heading' => $validated['heading'],
+        'description' => $validated['description'],
+        'image' => $imagePath, // Store the new or old image path
+    ]);
+
+    return redirect()->route('admin.viewAbout')->with('success', 'About Us entry updated successfully.');
+}
+
+// Delete AboutUs entry
+public function destroyAbout($id)
+{
+    $aboutUs = AboutUs::findOrFail($id);
+
+    // Delete the image file if it exists
+    if ($aboutUs->image && file_exists(public_path($aboutUs->image))) {
+        unlink(public_path($aboutUs->image));
+    }
+
+    // Delete the record from database
+    $aboutUs->delete();
+
+    return redirect()->route('admin.viewAbout')->with('success', 'About Us entry deleted successfully.');
+}
+
+
+
+
+
+
+    // Show all team members
+    public function viewTeam()
+    {
+        $teamMembers = Team::all();
+        return view('backend.admin.view-team', compact('teamMembers'));
+    }
+
+    // Show form to add a new team member
+    public function createTeam()
+    {
+        return view('backend.admin.create-team');
+    }
+
+    // Store a new team member
+    public function storeTeam(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,bmp|max:2048',
+        ]);
+
+        $team = new Team;
+        $team->name = $validated['name'];
+        $team->role = $validated['role'];
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('assets/images/team/'), $imageName);
+            $team->image = $imageName; 
+        }
+
+        $team->save();
+
+        return redirect()->route('admin.viewTeam')->with('success', 'Team member added successfully.');
+    }
+
+    // Show form to edit a team member
+    public function editTeam($id)
+    {
+        $team = Team::findOrFail($id);
+        return view('backend.admin.edit-team', compact('team'));
+    }
+
+    // Update a team member
+    public function updateTeam(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,bmp|max:2048',
+        ]);
+
+        $team = Team::findOrFail($id);
+        $team->name = $validated['name'];
+        $team->role = $validated['role'];
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if (File::exists(public_path($team->image))) {
+                File::delete(public_path($team->image));
+            }
+
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('assets/images/team/'), $imageName);
+            $team->image = $imageName; 
+        }
+
+        $team->save();
+
+        return redirect()->route('admin.viewTeam')->with('success', 'Team member updated successfully.');
+    }
+
+    // Delete a team member
+    public function destroyTeam($id)
+    {
+        $team = Team::findOrFail($id);
+
+        // Delete image if exists
+        if (File::exists(public_path($team->image))) {
+            File::delete(public_path($team->image));
+        }
+
+        $team->delete();
+
+        return redirect()->route('admin.viewTeam')->with('success', 'Team member deleted successfully.');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
