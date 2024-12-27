@@ -15,7 +15,8 @@
             </div>
             <div class="col-lg-6">
                 <!-- Display Image -->
-                <img src="{{ asset('assets/images/aboutimages/' . $aboutUs->image) ?? 'https://via.placeholder.com/500x300' }}" class="img-fluid rounded" alt="About Us">
+                <img src="{{ asset('' . $aboutUs->image) ?? 'https://via.placeholder.com/500x300' }}" class="img-fluid rounded" alt="About Us">
+
             </div>
         </div>
     </div>
@@ -29,9 +30,8 @@
             @foreach($teamMembers as $member)
                 <div class="col-md-4">
                     <div class="card">
-                        <!-- Corrected Image Path with Fallback -->
-                        <img src="{{ asset('assets/images/team/' . $member->image) ?? 'https://via.placeholder.com/500x300' }}" class="card-img-top" alt="{{ $member->name }}">
-                        <div class="card-body text-center">
+                    <img src="{{ asset('assets/images/team/' . $member->image) }}" class="card-img-top" alt="{{ $member->name }}">
+                    <div class="card-body text-center">
                             <h5 class="card-title">{{ $member->name }}</h5>
                             <p class="card-text">{{ $member->role }}</p>
                         </div>

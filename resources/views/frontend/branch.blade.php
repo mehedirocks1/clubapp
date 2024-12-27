@@ -12,7 +12,7 @@
       <div class="row g-0">
         <div class="col-md-4">
           <!-- Use branch image or placeholder -->
-          <img src="{{ asset('assets/images/branches/' . $branch->image) ?? 'https://via.placeholder.com/400x300' }}" class="img-fluid rounded-start" alt="{{ $branch->name }}">
+          <img src="{{ asset('images/branches/' . $branch->image) ?? 'https://via.placeholder.com/400x300' }}" class="img-fluid rounded-start" alt="{{ $branch->name }}">
         </div>
         <div class="col-md-8">
           <div class="card-body">

@@ -120,6 +120,8 @@ class RegistrationController extends Controller
         }
     }
 
+
+    
     private function sendPasswordEmail($user, $password)
     {
         try {
@@ -137,6 +139,47 @@ class RegistrationController extends Controller
             Log::error('Error sending email: ' . $e->getMessage());
         }
     }
+
+
+
+
+/*
+private function sendPasswordEmail($user, $password)
+{
+    try {
+        // Email body content
+        $emailBody = "Hello {$user->first_name},\n\nYour login credentials are as follows:\nEmail: {$user->email}\nPassword: {$password}\n\nThank you for registering with us.";
+
+        // Send email using the Mail facade
+        $result = Mail::raw($emailBody, function ($message) use ($user) {
+            $message->to($user->email)
+                    ->subject('Your Login Information');
+        });
+
+        Log::info('Email sent successfully to ' . $user->email);
+    } catch (\Exception $e) {
+        Log::error('Error sending email: ' . $e->getMessage());
+        // Log the result if available
+        Log::error('Mail result: ' . json_encode($result ?? 'No result'));
+    }
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Show the registration success page
     public function success()

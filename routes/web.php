@@ -110,7 +110,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::match(['get', 'post'], '/change-slider', [WebsiteController::class, 'changeSlider'])->name('changeSlider');
     Route::get('/branches', [WebsiteController::class, 'branches'])->name('branches');
     //Route::get('/view-about', [WebsiteController::class, 'viewAbout'])->name('viewAbout');
-    Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
+    //Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
     Route::get('/create-branch', [WebsiteController::class, 'createBranch'])->name('createBranch');
     Route::post('/store-branch', [WebsiteController::class, 'storeBranch'])->name('storeBranch');
     Route::get('/edit-branch/{id}', [WebsiteController::class, 'editBranch'])->name('editBranch');
@@ -135,6 +135,20 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/edit-team/{id}', [WebsiteController::class, 'editTeam'])->name('editTeam');
     Route::put('/update-team/{id}', [WebsiteController::class, 'updateTeam'])->name('updateTeam');
     Route::delete('/delete-team/{id}', [WebsiteController::class, 'destroyTeam'])->name('deleteTeam');
+
+
+
+    Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
+    Route::post('/gallery/store', [WebsiteController::class, 'storeGallery'])->name('storeGallery');
+    Route::put('/gallery/update/{id}', [WebsiteController::class, 'updateGallery'])->name('updateGallery');
+    Route::delete('/gallery/delete/{id}', [WebsiteController::class, 'destroyGallery'])->name('deleteGallery');
+
+
+
+
+
+
+
 });
 
 

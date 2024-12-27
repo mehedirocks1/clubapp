@@ -7,66 +7,25 @@
 <div class="container my-5">
   <h2 class="text-center">Image Gallery</h2>
   <div class="row g-4">
-    <!-- Gallery Item 1 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 1">
-        <div class="card-body">
-          <p class="card-text">Image 1 Description</p>
+    @forelse($galleryImages as $image)
+      <div class="col-md-4 col-sm-6">
+        <div class="card">
+          <img src="{{ asset('assets/images/gallery/' . $image->image) }}" class="card-img-top" alt="{{ $image->description }}">
+          <div class="card-body">
+            <p class="card-text">{{ $image->description }}</p>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Gallery Item 2 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 2">
-        <div class="card-body">
-          <p class="card-text">Image 2 Description</p>
-        </div>
+    @empty
+      <div class="col-12">
+        <p class="text-center">No images found in the gallery.</p>
       </div>
-    </div>
+    @endforelse
+  </div>
 
-    <!-- Gallery Item 3 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 3">
-        <div class="card-body">
-          <p class="card-text">Image 3 Description</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery Item 4 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 4">
-        <div class="card-body">
-          <p class="card-text">Image 4 Description</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery Item 5 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 5">
-        <div class="card-body">
-          <p class="card-text">Image 5 Description</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery Item 6 -->
-    <div class="col-md-4 col-sm-6">
-      <div class="card">
-        <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Image 6">
-        <div class="card-body">
-          <p class="card-text">Image 6 Description</p>
-        </div>
-      </div>
-    </div>
-
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-4">
+    {{ $galleryImages->links('pagination::bootstrap-4') }}
   </div>
 </div>
 

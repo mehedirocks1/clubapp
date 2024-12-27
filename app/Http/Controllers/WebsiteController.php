@@ -14,6 +14,14 @@ use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\MemberController;
 use App\Models\AboutUs;
 use App\Models\Team;
+use App\Models\Gallery;
+
+
+
+
+
+
+
 
 class WebsiteController extends Controller
 {
@@ -229,10 +237,7 @@ class WebsiteController extends Controller
         return view('backend.admin.view-about');
     }
 */
-    public function gallery()
-    {
-        return view('backend.admin.gallery');
-    }
+
 
 
 // View all AboutUs data
@@ -431,6 +436,83 @@ public function destroyAbout($id)
     }
 
 
+
+
+
+
+
+
+
+
+// View Gallery
+public function gallery()
+{
+    //$galleryImages = Gallery::all();
+    $galleryImages = Gallery::paginate(6);
+    return view('backend.admin.gallery', compact('galleryImages'));
+}
+
+// Add Gallery Image
+public function storeGallery(Request $request)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'description' => 'nullable|string|max:255',
+    ]);
+
+    $imageName = time() . '.' . $request->image->extension();
+    $request->image->move(public_path('assets/images/gallery'), $imageName);
+
+    Gallery::create([
+        'image' => $imageName,
+        'description' => $request->description,
+    ]);
+
+    return redirect()->route('admin.gallery')->with('success', 'Gallery image added successfully!');
+}
+
+// Edit Gallery Image
+public function updateGallery(Request $request, $id)
+{
+    $request->validate([
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'description' => 'nullable|string|max:255',
+    ]);
+
+    $gallery = Gallery::findOrFail($id);
+
+    if ($request->hasFile('image')) {
+        $oldImagePath = public_path('assets/images/gallery/' . $gallery->image);
+
+        if (File::exists($oldImagePath)) {
+            File::delete($oldImagePath);
+        }
+
+        $imageName = time() . '.' . $request->image->extension();
+        $request->image->move(public_path('assets/images/gallery'), $imageName);
+        $gallery->image = $imageName;
+    }
+
+    $gallery->description = $request->description;
+    $gallery->save();
+
+    return redirect()->route('admin.gallery')->with('success', 'Gallery image updated successfully!');
+}
+
+// Delete Gallery Image
+public function destroyGallery($id)
+{
+    $gallery = Gallery::findOrFail($id);
+
+    $imagePath = public_path('assets/images/gallery/' . $gallery->image);
+    if (File::exists($imagePath)) {
+        File::delete($imagePath);
+    }
+
+    $gallery->delete();
+
+    return redirect()->route('admin.gallery')->with('success', 'Gallery image deleted successfully!');
+}
 
 
 

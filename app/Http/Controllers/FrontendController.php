@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Branch;
 use App\Models\Team;
 use App\Models\AboutUs;
+use App\Models\Gallery;
 
 
 
@@ -73,12 +74,32 @@ class FrontendController extends Controller
 
     
 
-
+/*
     // Show Gallery Page
     public function gallery()
     {
         return view('frontend.gallery');
     }
+*/
+
+
+
+
+public function gallery()
+{
+    // Fetch gallery images with pagination
+    $galleryImages = Gallery::paginate(6);
+
+    return view('frontend.gallery', compact('galleryImages'));
+}
+
+
+
+
+
+
+
+
 
     // Show Registration Page
     public function registration()
