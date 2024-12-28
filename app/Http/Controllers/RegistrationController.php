@@ -107,7 +107,8 @@ class RegistrationController extends Controller
         
             // Save the user with the updated remember_token
             $user->save();
-        
+            $this->sendPasswordSMS($user->mobile_number, $randomPassword);
+
             // Send the password to the user via email
             $this->sendPasswordEmail($user, $randomPassword);
         
@@ -125,23 +126,23 @@ class RegistrationController extends Controller
     private function sendPasswordEmail($user, $password)
     {
         try {
-            // Email body content
-            $emailBody = "Hello {$user->first_name},\n\nYour login credentials are as follows:\nEmail: {$user->email}\nPassword: {$password}\n\nThank you for registering with us.";
+            // Debug: Check the email configuration
+            Log::info('From email: ' . env('MAIL_FROM_ADDRESS'));
     
-            // Send email using the Mail facade
-            Mail::raw($emailBody, function ($message) use ($user) {
+            // Send email using Mail::send and passing the data to the view
+            Mail::send('frontend.registration-password', ['user' => $user, 'password' => $password], function ($message) use ($user) {
+                // Setting the email properties
                 $message->to($user->email)
-                        ->subject('Your Login Information');
+                        ->subject('Your Registration Password')
+                        ->from(env('MAIL_FROM_ADDRESS', 'default@example.com'), env('MAIL_FROM_NAME', 'Your Company Name')); // Using env with fallback
             });
     
             Log::info('Email sent successfully to ' . $user->email);
         } catch (\Exception $e) {
+            // Log the exception for debugging
             Log::error('Error sending email: ' . $e->getMessage());
         }
     }
-
-
-
 
 /*
 private function sendPasswordEmail($user, $password)
@@ -166,13 +167,55 @@ private function sendPasswordEmail($user, $password)
 */
 
 
+private function sendPasswordSMS($number, $password)
+    {
+        $message = "Hello, your registration is complete. Your login password is: {$password}.";
+        
+        // Call SMS API
+        $response = $this->sms_send($number, $message);
+        
+        // Log the response from the SMS API
+        Log::info('SMS sent successfully to ' . $number . '. Response: ' . $response);
+    }
 
 
 
 
 
+private function sms_send($number, $message)
+{
+    // Define the API URL
+    $url = "http://bulksmsbd.net/api/smsapi";
 
+    // Replace these with your actual API key and sender ID
+    $api_key = "c0kGJBawNsKzQa6vsoSF";  // Add your actual API key here
+    $senderid = "POJ CLUB";  // Add your sender ID here
 
+    // Prepare the data for the request
+    $data = [
+        "api_key" => $api_key,
+        "senderid" => $senderid,
+        "number" => $number,
+        "message" => $message
+    ];
+
+    // Initialize cURL session
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // Correctly format the data
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    // Execute the request and capture the response
+    $response = curl_exec($ch);
+
+    // Close the cURL session
+    curl_close($ch);
+
+    // Return the response
+    return $response;
+}
 
 
 

@@ -83,27 +83,11 @@ class MemberController extends Controller
         return redirect()->back()->with('success', 'Password reset successfully. New password sent to user\'s email.');
     }
 
-    // Send a message to a member
-    public function sendMessage(Request $request, $id)
-    {
-        $admin = auth()->user();
 
-        // Manual role check (only allow if role_id is 1)
-        if ($admin->role_id != 1) {
-            abort(403, 'Unauthorized action.');
-        }
 
-        $member = User::findOrFail($id);
 
-        $request->validate([
-            'message' => 'required|string',
-        ]);
 
-        // Assuming Notification or Mail system for message sending
-        // \Notification::send($member, new MemberMessageNotification($request->message));
 
-        return redirect()->back()->with('success', 'Message sent successfully.');
-    }
 
     // Update member's status (active/inactive toggle)
     public function updateStatus($id)
@@ -211,7 +195,68 @@ public function destroy($id)
     return redirect()->route('admin.viewMembers')->with('success', 'Member deleted successfully.');
 }
 
+public function showMessageForm($id)
+{
+    // Retrieve the member information based on ID
+    $member = User::findOrFail($id);
 
+    // Pass the member data to the view
+    return view('backend.admin.send-sms', compact('member'));
+}
+
+public function sendSMS(Request $request, $id)
+{
+    // Retrieve the member information based on ID
+    $member = User::findOrFail($id);
+
+    // Get the message from the form input
+    $message = $request->message;
+
+    // Send SMS via BulkSMSBD API
+    $response = $this->sms_send($member->mobile_number, $message);
+
+    // Log the response (You can store it in the database or check for success/failure)
+    \Log::info("Response from BulkSMSBD API: {$response}");
+
+    // Redirect back to the members page with a success message
+    return redirect()->route('admin.viewMembers')->with('success', 'SMS sent successfully!');
+}
+
+// Bulk SMS send function
+private function sms_send($number, $message)
+{
+    // Define the API URL
+    $url = "http://bulksmsbd.net/api/smsapi";
+
+    // Replace these with your actual API key and sender ID
+    $api_key = "c0kGJBawNsKzQa6vsoSF";  // Add your actual API key here
+    $senderid = "POJ CLUB";  // Add your sender ID here
+
+    // Prepare the data for the request
+    $data = [
+        "api_key" => $api_key,
+        "senderid" => $senderid,
+        "number" => $number,
+        "message" => $message
+    ];
+
+    // Initialize cURL session
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // Correctly format the data
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    // Execute the request and capture the response
+    $response = curl_exec($ch);
+
+    // Close the cURL session
+    curl_close($ch);
+
+    // Return the response
+    return $response;
+}
 
 
 }

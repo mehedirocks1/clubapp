@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BackendController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\MemberController;
+use Illuminate\Support\Facades\Mail;
 
 // Frontend Routes
 Route::get('/', [FrontendController::class, 'home'])->name('frontend.home');
@@ -69,20 +70,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
 
 Route::middleware('auth')->prefix('admin')->group(function () {
-    // Delete a member
-    //Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('admin.destroyMember');
-    
-    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('admin.destroyMember');
-
     // View all members
     Route::get('/members', [MemberController::class, 'viewMembers'])->name('admin.viewMembers');
-    
-    // Update member status
-    Route::put('/members/{id}/status', [MemberController::class, 'updateStatus'])->name('admin.updateStatus');
-    
-    // Edit a member
-    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('admin.editMember');
-    
     
     // View a single member
     Route::get('/members/{id}/view', [MemberController::class, 'viewMember'])->name('admin.viewMember');
@@ -90,13 +79,28 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     // Download a member's details as PDF
     Route::get('/members/{id}/download', [MemberController::class, 'downloadMember'])->name('admin.downloadMember');
     
-    // Send a message to a member
-    Route::post('/members/{id}/message', [MemberController::class, 'sendMessage'])->name('admin.sendMessage');
+    // Update member status
+    Route::put('/members/{id}/status', [MemberController::class, 'updateStatus'])->name('admin.updateStatus');
+    
+    // Edit a member
+    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('admin.editMember');
     
     // Update a member's details
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('admin.updateMember');
     
+    // Reset a member's password
+    Route::post('/members/{id}/reset-password', [MemberController::class, 'resetPassword'])->name('admin.resetPassword');
+    
+    // Send a message to a member
+    //Route::post('/members/{id}/message', [MemberController::class, 'sendMessage'])->name('admin.sendMessage');
+    Route::post('/members/{id}/submit-message', [MemberController::class, 'sendSMS'])->name('admin.submitMessage');
+    Route::get('/members/{id}/message', [MemberController::class, 'showMessageForm'])->name('admin.sendMessage');
+
+    // Delete a member
+    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('admin.destroyMember');
+
 });
+
 
 
 
